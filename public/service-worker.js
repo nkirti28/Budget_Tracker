@@ -1,78 +1,65 @@
+const APP_PREFIX = "BudgetTracker-";
+const VERSION = "version_01";
+const CACHE_NAME = APP_PREFIX + VERSION;
+
 const FILES_TO_CACHE = [
-  `/idb.js`,
-  `/index.html`,
-  `/index.js`,
-  `/index.css`,
-  `/manifest.webmanifest`,
-  `/icons/icon-192x192.png`,
+  "./index.html",
+  "./css/styles.css",
+  "./js/index.js",
+  "./js/idb.js",
+  "./manifest.json",
+  "./icons/icon-512x512.png",
+  "./icons/icon-384x384.png",
+  "./icons/icon-192x192.png",
+  "./icons/icon-152x152.png",
+  "./icons/icon-144x144.png",
+  "./icons/icon-128x128.png",
+  "./icons/icon-96x96.png",
+  "./icons/icon-72x72.png",
 ];
 
-const STATIC_CACHE = `static-cache-v1`;
-const RUNTIME_CACHE = `runtime-cache`;
-
-self.addEventListener(`install`, (event) => {
-  event.waitUntil(
-    caches
-      .open(STATIC_CACHE)
-      .then((cache) => cache.addAll(FILES_TO_CACHE))
-      .then(() => self.skipWaiting())
+self.addEventListener("install", function (e) {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(function (cache) {
+      console.log("installing cache : " + CACHE_NAME);
+      return cache.addAll(FILES_TO_CACHE);
+    })
   );
 });
 
-self.addEventListener(`activate`, (event) => {
-  const currentCaches = [STATIC_CACHE, RUNTIME_CACHE];
-  event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) =>
-        // return array of cache names that are old to delete
-        cacheNames.filter((cacheName) => !currentCaches.includes(cacheName))
-      )
-      .then((cachesToDelete) =>
-        Promise.all(
-          cachesToDelete.map((cacheToDelete) => caches.delete(cacheToDelete))
-        )
-      )
-      .then(() => self.clients.claim())
+self.addEventListener("activate", function (e) {
+  e.waitUntil(
+    caches.keys().then(function (keyList) {
+      let cacheKeeplist = keyList.filter(function (key) {
+        return key.indexOf(APP_PREFIX);
+      });
+      cacheKeeplist.push(CACHE_NAME);
+
+      return Promise.all(
+        keyList.map(function (key, i) {
+          if (cacheKeeplist.indexOf(key) === -1) {
+            console.log("deleting cache : " + keyList[i]);
+            return caches.delete(keyList[i]);
+          }
+        })
+      );
+    })
   );
 });
 
-self.addEventListener(`fetch`, (event) => {
-  if (
-    event.request.method !== `GET` ||
-    !event.request.url.startsWith(self.location.origin)
-  ) {
-    event.respondWith(fetch(event.request));
-    return;
-  }
-
-  if (event.request.url.includes(`/api/transaction`)) {
-    event.respondWith(
-      caches.open(RUNTIME_CACHE).then((cache) =>
-        fetch(event.request)
-          .then((response) => {
-            cache.put(event.request, response.clone());
-            return response;
-          })
-          .catch(() => caches.match(event.request))
-      )
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
+self.addEventListener("fetch", function (e) {
+  console.log("fetch request : " + e.request.url);
+  e.respondWith(
+    caches.match(e.request).then(function (request) {
+      if (request) {
+        // if cache is available, respond with cache
+        console.log("responding with cache : " + e.request.url);
+        return request;
+      } else {
+        // if there are no cache, try fetching request
+        console.log("file is not cached, fetching : " + e.request.url);
+        return fetch(e.request);
       }
-
-      return caches
-        .open(RUNTIME_CACHE)
-        .then((cache) =>
-          fetch(event.request).then((response) =>
-            cache.put(event.request, response.clone()).then(() => response)
-          )
-        );
     })
   );
 });
