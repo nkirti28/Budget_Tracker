@@ -28,21 +28,17 @@ For more information on how to add screenshots for examples, visit the following
 
 ## [User Story](#table-of-contents)
 
-AS A social media startup
-I WANT an API for my social network that uses a NoSQL database
-SO THAT my website can handle large amounts of unstructured data
+AS AN avid traveler
+I WANT to be able to track my withdrawals and deposits with or without a data/internet connection
+SO THAT my account balance is accurate when I am traveling
 
 ### Acceptance Criteria
 
-GIVEN a social network API
-WHEN I enter the command to invoke the application
-THEN my server is started and the Mongoose models are synced to the MongoDB database
-WHEN I open API GET routes in Insomnia for users and thoughts
-THEN the data for each of these routes is displayed in a formatted JSON
-WHEN I test API POST, PUT, and DELETE routes in Insomnia
-THEN I am able to successfully create, update, and delete users and thoughts in my database
-WHEN I test API POST and DELETE routes in Insomnia
-THEN I am able to successfully create and delete reactions to thoughts and add and remove friends to a user’s friend list
+GIVEN a budget tracker without an internet connection
+WHEN the user inputs an expense or deposit
+THEN they will receive a notification that they have added an expense or deposit
+WHEN the user reestablishes an internet connection
+THEN the deposits or expenses added while they were offline are added to their transaction history and their totals are updated
 
 ## [Installation](#table-of-contents)
 
@@ -50,29 +46,19 @@ THEN I am able to successfully create and delete reactions to thoughts and add a
 
 - To install necessary dependencies, run the following command :
 
-npm i
-
-npm install mongoose
-
-npm i moment
-
 - The application will be invoked with the following command: This will start localhost server on PORT 3001.
 
 npm start
-
-- Open Insomnia and test API routes for application
 
 ## Technologies
 
 This app uses the following technologies:
 
-- [Express](https://www.npmjs.com/package/express)
-- [Mongoose](https://www.mongoosejs.com/package/mongoose)
-- [Moment](https://momentjs.com/)
+- PWA - Progressive Webpack application
 
 ## [License](#table-of-contents)
 
-The application is covered under the following license:
+The application is covered under following license:
 [MIT](https://choosealicense.com/licenses/MIT)
 
 ## [Contributing](#table-of-contents)
@@ -83,7 +69,7 @@ Thank you for your interest in helping out; however, I will not be accepting con
 
 - Used 'Express.js' to build server
 
-- MongoDB
+- MongoDB Atlas
 
 ## [Questions](#table-of-contents)
 
